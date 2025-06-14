@@ -1,0 +1,87 @@
+<!-- news/templates/news/latest_news.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Свежие новости</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #007B5E;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005f47;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        .news-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1>Свежие новости (за 12 часов)</h1>
+
+<button id="loadNewsBtn">Загрузить свежие новости</button>
+
+<div id="result"></div>
+
+<a href="{% url 'news_list' %}">← Вернуться ко всем новостям</a>
+
+<script>
+    document.getElementById("loadNewsBtn").addEventListener("click", function () {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "Загрузка...";
+
+        fetch("{% url 'fetch_latest_news' %}", {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            resultDiv.innerHTML = "";
+            if (data.news.length === 0) {
+                resultDiv.innerHTML = "<p>Новых новостей не найдено.</p>";
+            } else {
+                data.news.forEach(news => {
+                    const div = document.createElement("div");
+                    div.className = "news-item";
+                    div.innerHTML = `
+                        <h3>${news.title}</h3>
+                        <p><strong>Категория:</strong> ${news.category}</p>
+                        <p><strong>Эмоции:</strong> ${news.sentiment}</p>
+                        <p>${news.summary}</p>
+                        <a href="${news.link}" target="_blank">Читать полностью</a>
+                    `;
+                    resultDiv.appendChild(div);
+                });
+            }
+        })
+        .catch(error => {
+            resultDiv.innerHTML = "<p style='color:red;'>Ошибка загрузки новостей.</p>";
+            console.error("Ошибка:", error);
+        });
+    });
+</script>
+
+</body>
+</html>

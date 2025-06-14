@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все новости</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2a2a2a;
+        }
+
+        .news-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .news-item h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+        }
+
+        .news-item p {
+            margin: 5px 0;
+        }
+
+        .news-item a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007B5E;
+            text-decoration: none;
+        }
+
+        .news-item a:hover {
+            text-decoration: underline;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        select, button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .top-links {
+            margin-bottom: 20px;
+        }
+
+        .top-links a {
+            text-decoration: none;
+            background: #007B5E;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .top-links a:hover {
+            background: #005f46;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Новости</h1>
+
+<div class="top-links">
+    <a href="{% url 'latest_news' %}">🕒 Свежие новости за 12 часов</a>
+</div>
+
+<form method="get">
+    <label for="category">Категория:</label>
+    <select name="category" id="category">
+        <option value="">Все категории</option>
+        <option value="политика" {% if selected_category == 'политика' %}selected{% endif %}>Политика</option>
+        <option value="экономика" {% if selected_category == 'экономика' %}selected{% endif %}>Экономика</option>
+        <option value="технологии" {% if selected_category == 'технологии' %}selected{% endif %}>Технологии</option>
+    </select>
+    <button type="submit">Фильтровать</button>
+</form>
+
+{% if news_list %}
+    {% for news in news_list %}
+        <div class="news-item">
+            <h2>{{ news.title }}</h2>
+            <p><strong>Категория:</strong> {{ news.category }}</p>
+            <p><strong>Эмоции:</strong> {{ news.sentiment }}</p>
+            <p>{{ news.summary }}</p>
+            <a href="{{ news.link }}" target="_blank">Читать полностью</a>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Новостей по выбранной категории не найдено.</p>
+{% endif %}
+
+</body>
+</html>
